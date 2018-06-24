@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>Icebox!</title>
+        <meta charset="UTF-8"> 
+        <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+        <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    </head>
+    <body>
+        <div id="app">
+                <b-navbar class="mb-3" sticky toggleable="md" type="dark" variant="info">
+                    <b-navbar-brand href="#">Icebox!</b-navbar-brand>
+                </b-navbar>
+                <overview />
+            
+        </div>
+        <template id="overview-template">
+            <b-container fluid class="bv-example-row" >
+                <keyboard></keyboard>
+
+                <consumers></consumers>
+        
+                <drinks></drinks>
+            </b-container>            
+        </template>
+        <template id="keyboard-template">
+            <div>
+                <b-button-group  class="mb-3">
+                    <b-button v-on:click="deleteInput" variant="danger">&emsp;&emsp;&emsp;</b-button>
+                    <b-input v-bind:value='input'></b-input>
+                    <b-button v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
+                
+                </b-button-group>
+            </div>
+        </template>
+
+        <template id="drinks-template">
+            <div>
+                <b-card-group columns>                               
+                    <b-card v-for="drink in drinks" :key="drink.name" bg-variant="secondary" text-variant="white">
+                        <b-card-body>
+                            <b-img width="30%" class="mr-4" fluid v-bind:src="drink.image">
+
+                            </b-img>
+                            <span>
+                                {{drink.name}} {{ drink.fullprice /100}}€
+                            </span>
+                        </b-card-body>
+                    </b-card>                         
+                </b-card-group>
+            </div>
+        </template>
+        <template id="consumers-template">
+                <div class="mb-3">
+                    <b-button class="m-1" size="lg" variant="primary" v-for="consumer in consumers" :key="consumer.username">
+                            {{consumer.username}}
+                    </b-button>
+                </div>
+    
+        </template>
+
+        <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>        
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+        <script src="app.js"></script>
+    </body>
+</html>
