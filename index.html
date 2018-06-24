@@ -9,10 +9,16 @@
         <div id="app">
                 <b-navbar class="mb-3" sticky toggleable="md" type="dark" variant="info">
                     <b-navbar-brand href="#">Icebox!</b-navbar-brand>
+                    <b-button-group>
+                        <b-button>Test User</b-button>
+                        <b-button>Test Drink</b-button>
+                        <b-input v-bind="Keyboard.input"></b-input>
+                    </b-button-group>   
                 </b-navbar>
                 <overview />
             
         </div>
+
         <template id="overview-template">
             <b-container fluid class="bv-example-row" >
                 <keyboard></keyboard>
@@ -26,7 +32,7 @@
             <div>
                 <b-button-group  class="mb-3">
                     <b-button v-on:click="deleteInput" variant="danger">&emsp;&emsp;&emsp;</b-button>
-                    <b-input v-bind:value='input'></b-input>
+                    <b-input v-model='input'></b-input>
                     <b-button v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 
                 </b-button-group>
@@ -51,7 +57,7 @@
         </template>
         <template id="consumers-template">
                 <div class="mb-3">
-                    <b-button class="m-1" size="lg" variant="primary" v-for="consumer in consumers" :key="consumer.username">
+                    <b-button class="m-1" size="lg" variant="primary" v-for="consumer in filteredConsumers" :key="consumer.username">
                             {{consumer.username}}
                     </b-button>
                 </div>
