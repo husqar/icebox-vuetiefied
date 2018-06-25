@@ -4,20 +4,28 @@
         <meta charset="UTF-8"> 
         <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
         <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     </head>
     <body>
+        
         <div id="app">
                 <b-navbar class="mb-3" sticky toggleable="md" type="dark" variant="info">
                     <b-navbar-brand href="#">Icebox!</b-navbar-brand>
-                    <b-button-group>
-                        <b-button>Test User</b-button>
-                        <b-button>Test Drink</b-button>
-                        <b-input v-bind="Keyboard.input"></b-input>
-                    </b-button-group>   
+                    <revert-order></revert-order>
                 </b-navbar>
-                <overview />
-            
+                <overview></overview>
         </div>
+        
+        <template id="revert-order-template">
+            <b-collapse v-model="collapsed" id="revert-order-collapse">
+                <b-button-group class="mr-3">
+                    <b-button variant="danger"><span class="fas fa-times"></span></b-button>
+                    <b-button>{{ selectedDrink.name }}</b-button>
+                    <b-button>{{ selectedUser.username}}</b-button>
+                    <b-button variant="success"><span class="fas fa-check"></span></b-button>
+                </b-button-group>
+            </b-collapse>
+        </template>
 
         <template id="overview-template">
             <b-container fluid class="bv-example-row" >
@@ -28,19 +36,21 @@
                 <drinks></drinks>
             </b-container>            
         </template>
+        
         <template id="keyboard-template">
-            <div>
+            <b-container fluid >
                 <b-button-group  class="mb-3">
-                    <b-button v-on:click="deleteInput" variant="danger">&emsp;&emsp;&emsp;</b-button>
-                    <b-input v-model='input'></b-input>
-                    <b-button v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
+                    <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
+                    <b-input v-model='input' placeholder="Benutzer filtern"></b-input>
+                    <b-button size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 
                 </b-button-group>
-            </div>
+            </b-container>
         </template>
 
         <template id="drinks-template">
-            <div>
+            <b-container fluid>
+                <h3>Getränk wählen..</h3>
                 <b-card-group columns>                               
                     <b-card v-for="drink in drinks" :key="drink.name" bg-variant="secondary" text-variant="white">
                         <b-card-body>
@@ -53,15 +63,22 @@
                         </b-card-body>
                     </b-card>                         
                 </b-card-group>
-            </div>
+            </b-container>
         </template>
+        
         <template id="consumers-template">
                 <div class="mb-3">
-                    <b-button class="m-1" size="lg" variant="primary" v-for="consumer in filteredConsumers" :key="consumer.username">
-                            {{consumer.username}}
-                    </b-button>
-                </div>
-    
+                    <b-container fluid>
+                        <h3>Wähle deinen Nutzernamen..</h3>
+                        <b-row>
+                            <b-col sm="6" lg="4" md="3" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
+                                <b-button class="m-1" size="lg" v-bind:key="consumer.username" v-bind:value="consumer.username" v-on:click="selectConsumer" block variant="primary">
+                                    {{consumer.username}}
+                                </b-button>
+                            </b-col>
+                        </b-row>
+                    </b-container>
+                </div>    
         </template>
 
         <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>

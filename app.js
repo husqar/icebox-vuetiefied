@@ -13,6 +13,7 @@ Vue.mixin({
 const Overview = {
     template: '#overview-template'
 }
+Vue.component('overview', Overview);
 
 const Keyboard = {
     template: '#keyboard-template',
@@ -31,6 +32,7 @@ const Keyboard = {
         }
     }
 }
+Vue.component('keyboard', Keyboard);
 
 const Drinks =  {
     template: '#drinks-template',
@@ -49,13 +51,45 @@ const Drinks =  {
             }).catch(error => {
                 console.log(error);
             })
+        },
+        selectDrink(event){
+            console.log(event);
         }
     }
 };
+Vue.component('drinks', Drinks);
 
-const Orderpanel = {
-    template: '#orderpanel-template'
+const Revert_order = {
+    template: '#revert-order-template',
+    data: () => ({
+        selectedUser: null,
+        selectedDrink: null,
+    }),
+    mounted(){
+        this.eventHub.$on('user-selected',function(username){
+            this.selectedUser = username;
+        });
+        
+    },
+    method:{
+        deselectUser(){
+            this.selectedUser = null;
+        },
+        deselectDrink(){
+            this.selectedDrink = null;
+        }
+    },
+    computed:{
+        collapsed(){
+            if(this.selectedDrink == null || this.selectedUser == null){
+                return false;
+            }else{
+                return false;
+            }
+        }
+    }
 }
+Vue.component('revert-order', Revert_order); 
 
 const Consumers = {
     template: '#consumers-template',
@@ -67,7 +101,7 @@ const Consumers = {
         filteredConsumers(){
             function startsWith(wordToCompare) {
                 return function(string) {
-                    return string.username.indexOf(wordToCompare) === 0;
+                    return string.username.toLowerCase().indexOf(wordToCompare) === 0;
                 }
             }
             console.log(this.filterString);
@@ -90,17 +124,14 @@ const Consumers = {
             }).catch(error => {
                 console.log(error);
             })
+        },
+        selectConsumer(event){
+            this.eventHub.$emit('user-selected',event.target.value);
+            
         }
     }
 };
-
-Vue.component('orderpanel', Orderpanel);
 Vue.component('consumers', Consumers);
-Vue.component('drinks', Drinks);
-Vue.component('keyboard', Keyboard);
-Vue.component('overview', Overview);
-
 
 const vue = new Vue();
 var app = vue.$mount('#app');
-
