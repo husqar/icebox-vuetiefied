@@ -15,16 +15,21 @@
                 </b-navbar>
                 <overview></overview>
         </div>
-        
+
         <template id="revert-order-template">
-            <b-collapse v-model="collapsed" id="revert-order-collapse">
+
+
+            <div>
+
+            <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
                 <b-button-group class="mr-3">
-                    <b-button variant="danger"><span class="fas fa-times"></span></b-button>
-                    <b-button>{{ selectedDrink.name }}</b-button>
-                    <b-button>{{ selectedUser.username}}</b-button>
+                    <b-button variant="danger" v-on:click="deselectUser"><span class="fas fa-times"></span></b-button>
+                    <b-button>{{ selectedDrink }}</b-button>
+                    <b-button>{{ selectedUser}}</b-button>
                     <b-button variant="success"><span class="fas fa-check"></span></b-button>
                 </b-button-group>
             </b-collapse>
+            </div>
         </template>
 
         <template id="overview-template">
@@ -41,7 +46,7 @@
             <b-container fluid >
                 <b-button-group  class="mb-3">
                     <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
-                    <b-input v-model='input' placeholder="Benutzer filtern"></b-input>
+                    <b-input v-model='input' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
                     <b-button size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 
                 </b-button-group>
@@ -51,18 +56,25 @@
         <template id="drinks-template">
             <b-container fluid>
                 <h3>Getränk wählen..</h3>
-                <b-card-group columns>                               
-                    <b-card v-for="drink in drinks" :key="drink.name" bg-variant="secondary" text-variant="white">
-                        <b-card-body>
-                            <b-img width="30%" class="mr-4" fluid v-bind:src="drink.image">
+                <b-row>
+                    <b-col sm="12" lg="6" md="4" xl="3" v-for="drink in drinks" :key="drink.name">
+                        <b-button class="m-1 text-left" size="lg" v-bind:key="drink.name" v-bind:value="drink.name" v-on:click="selectDrink" block variant="primary">
 
-                            </b-img>
-                            <span>
-                                {{drink.name}} {{ drink.fullprice /100}}€
-                            </span>
-                        </b-card-body>
-                    </b-card>                         
-                </b-card-group>
+
+                                </b-img>
+                                <b-container fluid>
+                                <b-row>
+                                    <b-col cols="2">
+                                        <b-img width="30%" fluid v-bind:src="drink.image">
+                                    </b-col>
+                                    <b-col cols="10">
+                                        <div>{{drink.name}}</div>
+                                    </b-col>
+                                </b-row>
+                            </b-container>
+                        </b-button>
+                    </b-col>
+                </b-row>
             </b-container>
         </template>
         

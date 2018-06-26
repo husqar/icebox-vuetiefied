@@ -24,6 +24,8 @@ const Keyboard = {
     methods:{
         pressed(event){
             this.input += event.target.firstChild.data.toLowerCase();
+        },
+        changed(){
             this.eventHub.$emit('update',this.input);
         },
         deleteInput(){
@@ -51,9 +53,11 @@ const Drinks =  {
             }).catch(error => {
                 console.log(error);
             })
-        },
+        },        
         selectDrink(event){
-            console.log(event);
+            console.log('test');
+            this.eventHub.$emit('drink-selected', event.target.value);
+            
         }
     }
 };
@@ -64,27 +68,35 @@ const Revert_order = {
     data: () => ({
         selectedUser: null,
         selectedDrink: null,
+        collapse: true
     }),
     mounted(){
-        this.eventHub.$on('user-selected',function(username){
+        this.eventHub.$on('user-selected', username => {
             this.selectedUser = username;
         });
-        
+        this.eventHub.$on('drink-selected', drinkname => {
+            console.log(drinkname);
+            this.selectedDrink = drinkname;
+        });          
     },
-    method:{
+    methods:{
         deselectUser(){
             this.selectedUser = null;
+            console.log('user deselected');
         },
         deselectDrink(){
             this.selectedDrink = null;
+            console.log('drink deselected');
         }
     },
     computed:{
         collapsed(){
-            if(this.selectedDrink == null || this.selectedUser == null){
+            if(this.selectedDrink === null && this.selectedUser === null){
+                this.collapse = false;
                 return false;
             }else{
-                return false;
+                this.collapse = true;
+                return true;
             }
         }
     }
@@ -126,7 +138,7 @@ const Consumers = {
             })
         },
         selectConsumer(event){
-            this.eventHub.$emit('user-selected',event.target.value);
+            this.eventHub.$emit('user-selected', event.target.value);
             
         }
     }
