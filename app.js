@@ -82,7 +82,7 @@ const Drinks =  {
         getDrinks() {
             axios.get(baseUrl + `drinks`).then(response => {
                 this.state.drinks = response.data
-                this.state.drinks.map(drink => drink.image = 'img/bottle.png');
+                this.state.drinks.map(drink => drink.image = 'img/'+drink.barcode+'.png');
                 this.state.drinks = this.state.drinks.filter(function(drink){
                     if(drink.quantity > 0){
                         return drink; 
