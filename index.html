@@ -20,27 +20,26 @@
         </div>
 
         <template id="revert-order-template">
-            <b-container fluid>
-              
+            <b-container fluid>            
               
                     <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
                     <b-button-group class="mr-3">
                         <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas fa-times"></span></b-button>
-                        <b-button v-on:click="deselectDrink()">{{ selectedDrinkName }}</b-button>
                         <b-button v-on:click="deselectUser()">{{ state.selectedUser}}</b-button>
+                        <b-button disabled>kauft</b-button>
+                        <b-button v-on:click="deselectDrink()">{{ selectedDrinkName }}</b-button>
                         <b-button variant="success" v-on:click="buy()"><span class="fas fa-check"></span></b-button>
                     </b-button-group>
                 </b-collapse>
-         
 
-      
-                <b-alert class="ml-auto mb-2 mt-2" :show="dismissCountDown"
+                <b-alert class="mx-auto mb-2 mt-2" :show="dismissCountDown"
                 dismissible
                 fade
                 variant="secondary"
                 @dismissed="dismissCountDown=0"
                 @dismiss-count-down="countDownChanged">
-                    <b-button>Undo</b-button>
+
+                Gekauft! Du kannst noch {{dismissCountDown}} Sekunden  <b-button variant="danger"> Undo</b-button> machen!
                 
                 </b-alert>
 
@@ -80,7 +79,7 @@
                         v-bind:key="drink.barcode" 
                         v-bind:value="drink.barcode" 
                         v-on:click="selectDrink" 
-                        block variant="secondary">
+                        block variant="danger">
                                 <b-container fluid>
                                 <b-row>
                                     <b-col cols="2">                                       
