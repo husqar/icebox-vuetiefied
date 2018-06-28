@@ -7,43 +7,56 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     </head>
     <body>
-        
+                
         <div id="app">
-                <b-navbar class="mb-3" sticky toggleable="md" type="dark" variant="info">
-                    <b-navbar-brand href="#">Icebox!</b-navbar-brand>
+                <b-navbar style=" height:90px;" sticky toggleable="md" type="dark" variant="info">
+                    <b-navbar-brand  href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
                     <revert-order></revert-order>
                 </b-navbar>
                 <overview></overview>
         </div>
 
         <template id="revert-order-template">
+            <b-container fluid>
+              
+              
+                    <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
+                    <b-button-group class="mr-3">
+                        <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas fa-times"></span></b-button>
+                        <b-button v-on:click="deselectDrink()">{{ selectedDrinkName }}</b-button>
+                        <b-button v-on:click="deselectUser()">{{ state.selectedUser}}</b-button>
+                        <b-button variant="success" v-on:click="buy()"><span class="fas fa-check"></span></b-button>
+                    </b-button-group>
+                </b-collapse>
+         
 
+      
+                <b-alert class="ml-auto mb-2 mt-2" :show="dismissCountDown"
+                dismissible
+                fade
+                variant="secondary"
+                @dismissed="dismissCountDown=0"
+                @dismiss-count-down="countDownChanged">
+                    <b-button>Undo</b-button>
+                
+                </b-alert>
 
-            <div>
-
-            <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
-                <b-button-group class="mr-3">
-                    <b-button variant="danger" v-on:click="deselectUser"><span class="fas fa-times"></span></b-button>
-                    <b-button>{{ selectedDrink }}</b-button>
-                    <b-button>{{ selectedUser}}</b-button>
-                    <b-button variant="success"><span class="fas fa-check"></span></b-button>
-                </b-button-group>
-            </b-collapse>
-            </div>
+            </b-container>
         </template>
 
         <template id="overview-template">
             <b-container fluid class="bv-example-row" >
-                <keyboard></keyboard>
-
-                <consumers></consumers>
-        
+                <b-collapse v-model="showConsumers" id="consumer-collapse">
+                    <keyboard></keyboard>
+                    <consumers></consumers>
+                </b-collapse>
                 <drinks></drinks>
             </b-container>            
         </template>
         
         <template id="keyboard-template">
-            <b-container fluid >
+            
+            <b-container fluid class="mt-4">
                 <b-button-group  class="mb-3">
                     <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
                     <b-input v-model='input' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
@@ -57,18 +70,26 @@
             <b-container fluid>
                 <h3>Getränk wählen..</h3>
                 <b-row>
-                    <b-col sm="12" lg="6" md="4" xl="3" v-for="drink in drinks" :key="drink.name">
-                        <b-button class="m-1 text-left" size="lg" v-bind:key="drink.name" v-bind:value="drink.name" v-on:click="selectDrink" block variant="primary">
-
-
-                                </b-img>
+                    <b-col sm="12" lg="6" md="4" xl="3" v-for="drink in state.drinks">
+                        <b-button 
+                        class="m-1 text-left" 
+                        size="lg" 
+                        v-bind:key="drink.barcode" 
+                        v-bind:value="drink.barcode" 
+                        v-on:click="selectDrink" 
+                        block variant="primary">
                                 <b-container fluid>
                                 <b-row>
                                     <b-col cols="2">
                                         <b-img width="30%" fluid v-bind:src="drink.image">
                                     </b-col>
                                     <b-col cols="10">
-                                        <div>{{drink.name}}</div>
+                                        <div>
+                                            {{drink.name}}<br/>
+                                            Anzahl: {{drink.quantity}}<br/>
+                                            Preis: <template v-if="state.selectedUser === 'Anonym'" >{{drink.fullprice}}</template>
+                                                    <template v-else>{{drink.discountprice}}</template>
+                                        </div>
                                     </b-col>
                                 </b-row>
                             </b-container>
@@ -83,14 +104,18 @@
                     <b-container fluid>
                         <h3>Wähle deinen Nutzernamen..</h3>
                         <b-row>
+                                <b-col cols="12"><b-button v-on:click="selectConsumer" value="Anonym" class="m-1" block>Bar</b-button></b-col>
+                        </b-row>
+                        <b-row>
+                            
                             <b-col sm="6" lg="4" md="3" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
-                                <b-button class="m-1" size="lg" v-bind:key="consumer.username" v-bind:value="consumer.username" v-on:click="selectConsumer" block variant="primary">
+                                <b-button class="m-1" size="lg" v-bind:value="consumer.username" v-on:click="selectConsumer" block variant="primary">
                                     {{consumer.username}}
                                 </b-button>
                             </b-col>
                         </b-row>
                     </b-container>
-                </div>    
+                </div>  
         </template>
 
         <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
