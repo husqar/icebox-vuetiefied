@@ -225,6 +225,34 @@ const Consumers = {
 };
 Vue.component('consumers', Consumers);
 
+const Inventur = {
+    template: '#inventur-template',
+
+}
+Vue.component('inventur', Inventur);
+
+const router = new VueRouter({
+    routes: [
+        {
+            path: '/',
+            name: 'overview',
+            components: {
+                main: Overview,
+                navbar: Revert_order
+            },
+        },
+        {
+            path: '/inventur',
+            name: 'inventur',
+                components:{
+                    main: Inventur
+                }
+        }
+    ]
+  })
+  
+
 const vue = new Vue({
+    router
 });
 var app = vue.$mount('#app');

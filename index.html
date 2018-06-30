@@ -39,11 +39,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                 <b-collapse is-nav id="nav_dropdown_collapse">
                     <b-navbar-brand href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
                 </b-collapse>
-                <revert-order></revert-order>
+                <router-view name="navbar">
             </b-navbar>
-            <overview></overview>
+            <router-view name="main">
         </div>
-
+        
+        <template id="inventur-template">
+            <drinks></drinks>    
+        </template>
+        
         <template id="revert-order-template">
             <b-container fluid>            
               
