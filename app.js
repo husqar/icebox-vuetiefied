@@ -207,6 +207,5 @@ const Consumers = {
 Vue.component('consumers', Consumers);
 
 const vue = new Vue({
-}    
-);
+});
 var app = vue.$mount('#app');

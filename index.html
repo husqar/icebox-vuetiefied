@@ -5,19 +5,26 @@
         <link type="text/css" rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css" />
         <!-- <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/> -->
         <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
-
         <!-- <link type="text/css" rel="stylesheet" href="https://bootswatch.com/_assets/css/custom.min.css" /> -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     </head>
     <body>
+
+        <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>        
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+        <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
                 
         <div id="app">
-                <b-navbar style=" height:90px;" sticky toggleable="md" type="light" variant="light">
-                    <b-navbar-brand  href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
-                    <b-navbar-brand  href="#"><h4>Icebox!!</h4></b-navbar-brand>
-                    <revert-order></revert-order>
-                </b-navbar>
-                <overview></overview>
+            <b-navbar style=" height:90px;" sticky toggleable="sm" type="light" variant="light">
+                <b-collapse is-nav id="nav_dropdown_collapse">
+                    <b-navbar-brand href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
+                </b-collapse>
+                <revert-order></revert-order>
+            </b-navbar>
+            <overview></overview>
         </div>
 
         <template id="revert-order-template">
@@ -33,7 +40,7 @@
                     </b-button-group>
                 </b-collapse>
 
-                <b-alert class="mx-auto mb-2 mt-2" :show="dismissCountDown"
+                <b-alert class="mr-auto mb-2 mt-2" :show="dismissCountDown"
                 dismissible
                 fade
                 variant="secondary"
@@ -60,12 +67,14 @@
         <template id="keyboard-template">
             
             <b-container fluid class="mt-4">
-                <b-button-group  class="mb-3">
-                    <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
-                    <b-input v-model='input' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
+                <div  class="mb-3">
+                    <b-button-group>
+                        <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
+                        <b-input v-model='input' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
+                    </b-button-group>  
                     <b-button size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 
-                </b-button-group>
+                </div>
             </b-container>
         </template>
 
@@ -111,7 +120,7 @@
                         </b-row>
                         <b-row>
                             
-                            <b-col sm="6" lg="4" md="3" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
+                            <b-col sm="6" lg="3" md="4" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
                                 <b-button class="m-1" size="lg" v-bind:value="consumer.username" v-on:click="selectConsumer" block variant="primary">
                                     {{consumer.username}}
                                 </b-button>
@@ -121,11 +130,6 @@
                 </div>  
         </template>
 
-        <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
-        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>        
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
-        <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
         <script src="app.js"></script>
     </body>
 </html>
