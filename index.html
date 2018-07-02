@@ -82,7 +82,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         </template>
 
         <template id="keyboard-template">
-
             <b-container fluid class="mt-4">
                 <div class="mb-3">
                     <b-button-group>
@@ -108,15 +107,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                         block variant="danger">
                             <b-container fluid>
                                 <b-row>
-                                    <b-col cols="2">
-                                        <b-img height="80em" v-bind:src="drink.image">
+                                    <b-col cols="4">
+                                        <b-img center height="90em" block v-bind:src="drink.image"/>
                                     </b-col>
-                                    <b-col cols="10">
+                                    <b-col cols="8">
                                         <div>
                                             {{drink.name}}<br/>
                                             Anzahl: {{drink.quantity}}<br/>
                                             Preis: <template v-if="state.selectedUser === 'Anon'">{{drink.fullprice}}</template>
-                                                    <template v-else>{{drink.discountprice}}</template>
+                                                   <template v-else>{{drink.discountprice}}</template>
                                         </div>
                                     </b-col>
                                 </b-row>
