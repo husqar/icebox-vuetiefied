@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 /*
 Copyright (c) 2018 Johannes Christian Gosch
 Permission is hereby granted, free of charge,
@@ -16,7 +18,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const baseUrl = "http://icebox.nobreakspace.org:8081/";    
+const baseUrl = "http://172.23.208.37:8081/";    
 const eventHub = new Vue();
 
 //Eventually you want to use VueX instead of this rudiment source of truth
@@ -25,6 +27,8 @@ const state = {
     consumers: [],
     selectedUser: null,
     selectedDrink: null,
+    drinkCursor: {},
+    undoParameters: {},
 
     findDrinkByBarcode (barcode){
         return this.drinks.find(drink => drink.barcode === barcode);
@@ -35,11 +39,34 @@ Vue.mixin({
     data: function () {
         return {
             eventHub: eventHub,
-
-        }
-
+        };
     },
-})
+    methods:{
+        getDrinks() {
+            axios.get(baseUrl + `drinks`).then(response => {
+                response.data.map(drink => drink.image = 'img/'+drink.barcode+'.png');
+                response.data = response.data.filter(function(drink){
+                    if(drink.quantity > 0){
+                        return drink; 
+                    }
+                });
+                this.state.drinks = response.data;
+
+                console.log(this.state.drinks);
+            }).catch(error => {
+                console.log(error);
+            });
+            
+        },
+        getConsumers(){
+            axios.get(baseUrl + `consumers`).then(response => {
+                this.state.consumers = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
+        }
+    },
+});
 
 const Overview = {
     template: '#overview-template',
@@ -55,6 +82,10 @@ const Overview = {
         this.eventHub.$on('user-deselected',data => {
             this.showConsumers = true;
         });
+        this.eventHub.$on('bought',data =>{
+            this.Drinks.getDrinks();
+        });
+
     
     },
 }
@@ -89,33 +120,22 @@ Vue.component('keyboard', Keyboard);
 
 const Drinks =  {
     template: '#drinks-template',
+    props: ['inventur'],
     data: () => ({
         state: state
     
     }),
     mounted() {
         this.getDrinks();
+        this.eventHub.$on('bought', data => {
+            this.getDrinks();
+        });
     },
     inherit: true,
-    methods: {
-        getDrinks() {
-            axios.get(baseUrl + `drinks`).then(response => {
-                this.state.drinks = response.data
-                this.state.drinks.map(drink => drink.image = 'img/'+drink.barcode+'.png');
-                this.state.drinks = this.state.drinks.filter(function(drink){
-                    if(drink.quantity > 0){
-                        return drink; 
-                    }
-                });
-                console.log(this.state.drinks);
-            }).catch(error => {
-                console.log(error);
-            })
-        },        
-        selectDrink(event){
+    methods: {      
+        selectDrink(barcode){
+            this.eventHub.$emit('drink-selected', barcode);
             console.log(event);
-            this.eventHub.$emit('drink-selected', event.target.value);
-            
         }
     },
 };
@@ -150,14 +170,42 @@ const Revert_order = {
             console.log('drink deselected');
         },
         countDownChanged (dismissCountDown) {
-            this.dismissCountDown = dismissCountDown
+            this.dismissCountDown = dismissCountDown;
           },
         showAlert () {
-            this.dismissCountDown = this.dismissSecs
+            this.dismissCountDown= this.dismissSecs;
         },
-        buy(drink,consumer){
+        unbuy(){
+            console.log(this.state.undoParameters);
+            console.log(JSON.stringify(this.state.undoParameters));
+            axios.delete(baseUrl+'consumptions',JSON.stringify(this.state.undoParameters)).then(response => {
+            
+        }).catch(error => {
+            console.log(error);
+        });
+
+        },
+        buy(){
+            
+            axios.post(baseUrl+'consumptions', {
+                
+                "barcode": this.state.selectedDrink,
+                "username": this.state.selectedUser
+            
+        }).then(response => {
+            this.state.undoParameters = response.data.undoparameters;
+            console.log(response);
             this.showAlert();
             this.eventHub.$emit('bought');
+
+        }).catch(error => {
+  
+            this.$root.$emit('bv::show::modal','error')
+
+        });
+            this.eventHub.$emit('bought');
+            this.getConsumers();
+            this.getDrinks();
             this.deselectDrink();
             this.deselectUser();
         }
@@ -210,13 +258,6 @@ const Consumers = {
     },
     inherit: true,
     methods: {
-        getConsumers(){
-            axios.get(baseUrl + `consumers`).then(response => {
-                this.state.consumers = response.data
-            }).catch(error => {
-                console.log(error);
-            })
-        },
         selectConsumer(event){
             this.eventHub.$emit('user-selected', event.target.value);
             
@@ -249,7 +290,7 @@ const router = new VueRouter({
                 }
         }
     ]
-  })
+  });
   
 
 const vue = new Vue({

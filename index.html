@@ -1,4 +1,21 @@
-<!--
+
+<html>
+    <head>
+        <title>Icebox!</title>
+        <meta charset="UTF-8">
+        <link type="text/css" rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css" />
+        <!-- <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/> -->
+        <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+        <!-- <link type="text/css" rel="stylesheet" href="https://bootswatch.com/_assets/css/custom.min.css" /> -->
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+        <script src="https://unpkg.com/vue@2.5.21/dist/vue.js"></script>
+        <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+        <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    </head>
+    <!--
 Copyright (c) 2018 Johannes Christian Gosch
 Permission is hereby granted, free of charge,
 to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -15,26 +32,12 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
-<html>
-    <head>
-        <title>Icebox!</title>
-        <meta charset="UTF-8">
-        <link type="text/css" rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css" />
-        <!-- <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/> -->
-        <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
-        <!-- <link type="text/css" rel="stylesheet" href="https://bootswatch.com/_assets/css/custom.min.css" /> -->
-        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
-
-        <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
-        <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
-        <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
-        <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    </head>
     <body>
 
         <div id="app">
+                <b-modal id="error" title="Ooops">
+                        <p class="my-4">Irgend etwas ist schief gelaufen, eventuell hast du kein Guthaben.</p>
+                    </b-modal>
             <b-navbar style=" height:90px;" sticky toggleable="sm" type="light" variant="light">
                 <b-collapse is-nav id="nav_dropdown_collapse">
                     <b-navbar-brand href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
@@ -43,9 +46,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             </b-navbar>
             <router-view name="main">
         </div>
+        <div>
 
-        <template id="inventur-template">
-            <drinks></drinks>
+
+        <templfate id="inventur-template">
+            <b-container fluid>
+                <drinks inventur></drinks>
+            </container>
         </template>
 
         <template id="revert-order-template">
@@ -66,12 +73,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                 variant="secondary"
                 @dismissed="dismissCountDown=0"
                 @dismiss-count-down="countDownChanged">
-                    Gekauft! Du kannst noch {{dismissCountDown}} Sekunden <b-button variant="danger"> Undo</b-button> machen!
+                    Gekauft! Du kannst noch {{dismissCountDown}} Sekunden <b-button v-on:click="unbuy" variant="danger"> Undo</b-button> machen!
                 </b-alert>
             </b-container>
         </template>
 
         <template id="overview-template">
+              <!-- Modal Component -->
             <b-container fluid class="bv-example-row" >
                 <b-collapse v-model="showConsumers" id="consumer-collapse">
                     <keyboard></keyboard>
@@ -97,18 +105,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             <b-container fluid>
                 <h3>Getränk wählen:</h3>
                 <b-row>
-                    <b-col sm="12" lg="6" md="4" xl="3" v-for="drink in state.drinks">
+                    <b-col sm="12" lg="6" md="4" xl="3" v-for="drink in state.drinks" :key="drink.barcode">
                         <b-button 
                         class="m-1 text-left"
                         size="lg"
                         v-bind:key="drink.barcode"
                         v-bind:value="drink.barcode"
-                        v-on:click="selectDrink"
+                        v-on:click="selectDrink(drink.barcode)"
                         block variant="danger">
                             <b-container fluid>
                                 <b-row>
                                     <b-col cols="4">
-                                        <b-img center height="90em" block v-bind:src="drink.image"/>
+
+
+                                        <b-img
+                                        center 
+                                        height="90em" block
+                                        alt="test"                                     
+                                        v-bind:src="drink.image"
+                                        onerror="this.src='img/bottle.png'"
+                                        class="fallback"
+                                        />
+                                
                                     </b-col>
                                     <b-col cols="8">
                                         <div>
@@ -136,7 +154,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                         <b-row>
                             <b-col sm="6" lg="3" md="4" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
                                 <b-button class="m-1" size="lg" v-bind:value="consumer.username" v-on:click="selectConsumer" block variant="primary">
-                                    {{consumer.username}}
+                                    {{ consumer.username }}
                                 </b-button>
                             </b-col>
                         </b-row>
