@@ -172,15 +172,20 @@ const Revert_order = {
         countDownChanged (dismissCountDown) {
             this.dismissCountDown = dismissCountDown;
           },
+        hideAlert(){
+            this.dismissCountDown = 0;
+        },
         showAlert () {
             this.dismissCountDown= this.dismissSecs;
         },
         unbuy(){
             console.log(this.state.undoParameters);
             console.log(JSON.stringify(this.state.undoParameters));
+            this.hideAlert();
             axios.delete(baseUrl+'consumptions',JSON.stringify(this.state.undoParameters)).then(response => {
             
         }).catch(error => {
+            this.$root.$emit('bv::show::modal','error');
             console.log(error);
         });
 
