@@ -9,8 +9,8 @@
         <!-- <link type="text/css" rel="stylesheet" href="https://bootswatch.com/_assets/css/custom.min.css" /> -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
 
-        <script src="https://unpkg.com/vue@2.5.21/dist/vue.js"></script>
-        <script src="https://unpkg.com/vue-router@3.0.1/dist/vue-router.js"></script>
+        <script src="https://unpkg.com/vue@2.6.8/dist/vue.js"></script>
+        <script src="https://unpkg.com/vue-router@3.0.2/dist/vue-router.js"></script>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
         <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
@@ -68,7 +68,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <template id="revert-order-template">
             <b-container fluid>
                     <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
-                    <b-button-group class="mr-3">
+                  <b-button-group class="mr-3">
                         <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas fa-times"></span></b-button>
                         <b-button v-on:click="deselectUser()">{{ state.selectedUser}}</b-button>
                         <b-button disabled>kauft</b-button>
@@ -104,7 +104,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                 <div class="mb-3">
                     <b-button-group>
                         <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
-                        <b-input v-model='input' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
+                        <b-input v-model='filterinput' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
                     </b-button-group>
                     <b-button size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 </div>

@@ -18,7 +18,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const baseUrl = "http://172.23.208.37:8081/";    
+const baseUrl = "http://localhost:8081/";    
 const eventHub = new Vue();
 
 //Eventually you want to use VueX instead of this rudiment source of truth
@@ -33,11 +33,16 @@ const state = {
     findDrinkByBarcode (barcode){
         return this.drinks.find(drink => drink.barcode === barcode);
     }
-}
+};
+
+Vue.config.debug = true;
+Vue.config.devtools = true;
+
 //Eventually you want to use VueX instead of a global eventHub...
 Vue.mixin({
     data: function () {
         return {
+            state:state,
             eventHub: eventHub,
         };
     },
@@ -52,7 +57,7 @@ Vue.mixin({
                 });
                 this.state.drinks = response.data;
 
-                console.log(this.state.drinks);
+                console.log(response.data);
             }).catch(error => {
                 console.log(error);
             });
@@ -83,39 +88,39 @@ const Overview = {
             this.showConsumers = true;
         });
         this.eventHub.$on('bought',data =>{
-            this.Drinks.getDrinks();
+            this.getDrinks();
         });
 
     
     },
-}
+};
 Vue.component('overview', Overview);
 
 const Keyboard = {
     template: '#keyboard-template',
     data: () =>({
-        input: '',
-        letters: ['A','B','C','D','E','F','G','H','I','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-    }),
+        filterinput: '',
+        letters: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'] }),
     inherit: true,
     methods:{
         pressed(event){
-            this.input += event.target.firstChild.data.toLowerCase();
+            this.filterinput += event.target.firstChild.data.toLowerCase();
+            this.changed();
         },
         changed(){
-            this.eventHub.$emit('update',this.input);
+            this.eventHub.$emit('update',this.filterinput);
         },
         deleteInput(){
-            this.input = '';
-            this.eventHub.$emit('update',this.input);
+            this.filterinput = '';
+            this.eventHub.$emit('update',this.filterinput);
         }
     },
     mounted(){
         this.eventHub.$on('bought', data => {
-            this.input = '';
+            this.filterinput = '';
         });
     }
-}
+};
 Vue.component('keyboard', Keyboard);
 
 const Drinks =  {
@@ -135,7 +140,7 @@ const Drinks =  {
     methods: {      
         selectDrink(barcode){
             this.eventHub.$emit('drink-selected', barcode);
-            console.log(event);
+            //console.log(event);
         }
     },
 };
@@ -145,7 +150,6 @@ const Revert_order = {
     template: '#revert-order-template',
     inherit: true,
     data: () => ({
-        state:state,
         collapse: true,
         dismissSecs: 10,
         dismissCountDown: 0,
@@ -182,8 +186,10 @@ const Revert_order = {
             console.log(this.state.undoParameters);
             console.log(JSON.stringify(this.state.undoParameters));
             this.hideAlert();
+
             axios.delete(baseUrl+'consumptions',JSON.stringify(this.state.undoParameters)).then(response => {
             
+                this.eventHub.$emit('bought');
         }).catch(error => {
             this.$root.$emit('bv::show::modal','error');
             console.log(error);
@@ -191,13 +197,15 @@ const Revert_order = {
 
         },
         buy(){
-            
-            axios.post(baseUrl+'consumptions', {
-                
+            postData = {                
                 "barcode": this.state.selectedDrink,
                 "username": this.state.selectedUser
             
-        }).then(response => {
+            };
+            if(postData.username == 'Anon'){
+              postData.username = null;
+            }
+            axios.post(baseUrl+'consumptions', postData ).then(response => {
             this.state.undoParameters = response.data.undoparameters;
             console.log(response);
             this.showAlert();
@@ -205,7 +213,7 @@ const Revert_order = {
 
         }).catch(error => {
   
-            this.$root.$emit('bv::show::modal','error')
+            this.$root.$emit('bv::show::modal','error');
 
         });
             this.eventHub.$emit('bought');
@@ -233,13 +241,12 @@ const Revert_order = {
             }
         }
     }
-}
+};
 Vue.component('revert-order', Revert_order); 
 
 const Consumers = {
     template: '#consumers-template',
     data: () => ({
-        state: state,
         filterString: '',
     }),
     computed:{
@@ -247,7 +254,7 @@ const Consumers = {
             function startsWith(wordToCompare) {
                 return function(string) {
                     return string.username.toLowerCase().indexOf(wordToCompare) === 0;
-                }
+                };
             }
             console.log(this.filterString);
             return this.state.consumers.filter(
@@ -274,7 +281,7 @@ Vue.component('consumers', Consumers);
 const Inventur = {
     template: '#inventur-template',
 
-}
+};
 Vue.component('inventur', Inventur);
 
 const router = new VueRouter({
