@@ -3,7 +3,7 @@
     <head>
         <title>Icebox!</title>
         <meta charset="UTF-8">
-        <link type="text/css" rel="stylesheet" href="https://bootswatch.com/4/superhero/bootstrap.css" />
+        <link type="text/css" rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css" />
         <!-- <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/> -->
         <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
         <!-- <link type="text/css" rel="stylesheet" href="https://bootswatch.com/_assets/css/custom.min.css" /> -->
@@ -106,7 +106,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                         <b-button size="lg" v-on:click="deleteInput" variant="warning"><span class="fas fa-times"></b-button>
                         <b-input v-model='filterinput' v-on:input="changed" placeholder="Benutzer filtern"></b-input>
                     </b-button-group>
-                    <b-button size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
+                    <b-button style="margin-right:0.1em;" size="lg" v-on:click="pressed" v-for='letter in letters'>{{letter}}</b-button>
                 </div>
             </b-container>
         </template>
@@ -159,7 +159,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     <b-container fluid>
                         <h3>Wähle deinen Nutzernamen:</h3>
                         <b-row>
-                            <b-col cols="12"><b-button v-on:click="selectConsumer" value="Anon" class="m-1" block>Bar</b-button></b-col>
+                            <b-col cols="12"><b-button block variant="success" v-on:click="selectConsumer" value="Anon" class="m-1" block>Bar</b-button></b-col>
                         </b-row>
                         <b-row>
                             <b-col sm="6" lg="3" md="4" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
