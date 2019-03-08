@@ -47,7 +47,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <div id="app">
                 <b-modal id="error" title="Ooops">
                         <p class="my-4">Irgend etwas ist schief gelaufen, eventuell hast du kein Guthaben.</p>
-                    </b-modal>
+                </b-modal>
             <b-navbar style=" height:90px;" sticky toggleable="sm" type="light" variant="light">
                 <b-collapse is-nav id="nav_dropdown_collapse">
                     <b-navbar-brand href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
@@ -159,7 +159,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                     <b-container fluid>
                         <h3>Wähle deinen Nutzernamen:</h3>
                         <b-row>
-                            <b-col cols="12"><b-button block variant="success" v-on:click="selectConsumer" value="Anon" class="m-1" block>Bar</b-button></b-col>
+                          <b-col cols="12"><b-button block variant="success" v-on:click="selectConsumer" value="Anon" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">Bar</span></b-button></b-col>
                         </b-row>
                         <b-row>
                             <b-col sm="6" lg="3" md="4" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">
