@@ -18,7 +18,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const baseUrl = "http://icebox.nobreakspace.org:8081/";    
+const baseUrl = "http://localhost:8081/";    
 const eventHub = new Vue();
 
 //Eventually you want to use VueX instead of this rudiment source of truth
@@ -30,13 +30,23 @@ const state = {
     drinkCursor: {},
     undoParameters: {},
 
+
+
     findDrinkByBarcode (barcode){
         return this.drinks.find(drink => drink.barcode === barcode);
-    }
+    },
+
+    getDrink(){
+        if(this.selectedDrink != null){
+            return this.findDrinkByBarcode(this.selectedDrink);
+        }else{
+            return null;
+        }
+    },
 };
 
-Vue.config.debug = false;
-Vue.config.devtools = false;
+Vue.config.debug = true;
+Vue.config.devtools = true;
 
 //Eventually you want to use VueX instead of a global eventHub...
 Vue.mixin({
@@ -65,6 +75,7 @@ Vue.mixin({
         },
         getConsumers(){
             axios.get(baseUrl + `consumers`).then(response => {
+                console.log(response.data);
                 this.state.consumers = response.data;
             }).catch(error => {
                 console.log(error);
@@ -119,6 +130,9 @@ const Keyboard = {
         this.eventHub.$on('bought', data => {
             this.filterinput = '';
         });
+        this.eventHub.$on('notbought', data => {
+            this.filterinput = '';
+        });
     }
 };
 Vue.component('keyboard', Keyboard);
@@ -149,10 +163,12 @@ Vue.component('drinks', Drinks);
 const Revert_order = {    
     template: '#revert-order-template',
     inherit: true,
+    collapsed: true,
     data: () => ({
-        collapse: true,
         dismissSecs: 10,
         dismissCountDown: 0,
+        selectedUser: state.selectedUser,
+        selectDrink: state.selectedDrink
     }),
     mounted(){
         this.eventHub.$on('user-selected', user => {
@@ -165,9 +181,10 @@ const Revert_order = {
     },
     methods:{
         deselectUser(){
-            this.state.selectedUser = null;
+            this.state.selectedUser=null;
             console.log('user deselected');
             this.eventHub.$emit('user-deselected');
+            
         },
         deselectDrink(){
             this.state.selectedDrink = null;
@@ -199,7 +216,7 @@ const Revert_order = {
         buy(){
             postData = {                
                 "barcode": this.state.selectedDrink,
-                "username": this.state.selectedUser
+                "username": this.state.selectedUser.username
             
             };
             if(postData.username == 'Anon'){
@@ -209,11 +226,11 @@ const Revert_order = {
             this.state.undoParameters = response.data.undoparameters;
             console.log(response);
             this.showAlert();
-            this.eventHub.$emit('bought');
 
         }).catch(error => {
   
             this.$root.$emit('bv::show::modal','error');
+            this.eventHub.$emit('notbought');
 
         });
             this.eventHub.$emit('bought');
@@ -223,19 +240,29 @@ const Revert_order = {
             this.deselectUser();
         }
     },
+    watch:{
+        selectedUser : function(oldV,newV){
+            console.log(newV);
+        },
+        selectedDrink: function(old,newV){
+            console.log(newV);
+        }
+    
+    },
     computed:{
         collapsed(){
-            if(this.state.selectedDrink === null && this.state.selectedUser === null){
-                this.collapse = false;
-                return false;
-            }else{
-                this.collapse = true;
-                return true;
-            }
+            return (this.state.selectedUser != null || this.state.selectedDrink != null );
         },
         selectedDrinkName(){
             if(this.state.selectedDrink !== null && this.state.selectedDrink !== undefined){
                 return this.state.findDrinkByBarcode(this.state.selectedDrink).name;
+            }else{
+                return '';
+            }
+        },
+        selectedUserName(){
+            if(this.state.selectedUser != null){
+                return this.state.selectedUser.username;
             }else{
                 return '';
             }
@@ -267,11 +294,17 @@ const Consumers = {
         this.eventHub.$on('update', data => {
                 this.filterString = data;
             });
+            this.eventHub.$on('notbought', data => {
+                this.filterString = '';
+            });
+            this.eventHub.$on('bought', data => {
+                this.filterString = '';
+            });
     },
     inherit: true,
     methods: {
-        selectConsumer(event){
-            this.eventHub.$emit('user-selected', event.target.value);
+        selectConsumer(consumer){
+            this.eventHub.$emit('user-selected', consumer);
             
         }
     }
