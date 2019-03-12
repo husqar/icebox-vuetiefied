@@ -18,7 +18,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-const baseUrl = "http://localhost:8081/";    
+const baseUrl = "http://icebox.nobreakspace.org:8081/";    
 const eventHub = new Vue();
 
 //Eventually you want to use VueX instead of this rudiment source of truth
@@ -45,8 +45,8 @@ const state = {
     },
 };
 
-Vue.config.debug = true;
-Vue.config.devtools = true;
+Vue.config.debug = false;
+Vue.config.devtools = false;
 
 //Eventually you want to use VueX instead of a global eventHub...
 Vue.mixin({
