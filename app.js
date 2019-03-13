@@ -30,8 +30,6 @@ const state = {
     drinkCursor: {},
     undoParameters: {},
 
-
-
     findDrinkByBarcode (barcode){
         return this.drinks.find(drink => drink.barcode === barcode);
     },
@@ -77,6 +75,14 @@ Vue.mixin({
             axios.get(baseUrl + `consumers`).then(response => {
                 console.log(response.data);
                 this.state.consumers = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
+        },
+        getConsumer(id){
+            axios.get(baseUrl + `consumers/`+id).then(response => {
+                console.log(response.data);
+                this.state.selectedUser = response.data;
             }).catch(error => {
                 console.log(error);
             });
@@ -304,6 +310,7 @@ const Consumers = {
     inherit: true,
     methods: {
         selectConsumer(consumer){
+            this.getConsumer(consumer.username);
             this.eventHub.$emit('user-selected', consumer);
             
         }
