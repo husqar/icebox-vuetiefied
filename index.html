@@ -68,12 +68,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <template id="revert-order-template">
             <b-container fluid>
             <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
-                  <b-button-group class="mr-3">
-                        <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas fa-times"></span></b-button>
-                        <b-button v-on:click="deselectUser()">{{ selectedUserName }} <b-badge variant="info" v-if="state.selectedUser != null && state.selectedUser.username != 'Anon' ">{{ state.selectedUser.ledger/100 }}€</b-badge></b-button>
-                        <b-button disabled>kauft</b-button>
-                        <b-button v-on:click="deselectDrink()">{{ selectedDrinkName }} <b-badge variant="info" v-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username != 'Anon'">{{state.getDrink().discountprice/100}}€</b-badge><b-badge variant="info" v-else-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username == 'Anon'">{{state.getDrink().fullprice/100}}€</b-badge></b-button>
-                        <b-button v-if="((state.selectedUser != null && state.selectedUser.username == 'Anon' && state.selectedDrink != null) || (state.selectedUser != null && state.selectedDrink != null && state.getDrink().discountprice <= state.selectedUser.ledger))" variant="success" v-on:click="buy()"><span class="fas fa-check"></span></b-button>
+                  <b-button-group class="lg">
+                        <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas p-3 fa-2x fa-times"></span></b-button>
+                        <b-button class="p-4" v-on:click="deselectUser()">{{ selectedUserName }} <b-badge variant="info" v-if="state.selectedUser != null && state.selectedUser.username != 'Anon' ">{{ state.selectedUser.ledger/100 }}€</b-badge></b-button>
+                        <b-button class="p-4" disabled>kauft</b-button>
+                        <b-button class="p-4" v-on:click="deselectDrink()">{{ selectedDrinkName }} <b-badge variant="info" v-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username != 'Anon'">{{state.getDrink().discountprice/100}}€</b-badge><b-badge variant="info" v-else-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username == 'Anon'">{{state.getDrink().fullprice/100}}€</b-badge></b-button>
+                        <b-button class="" v-if="((state.selectedUser != null && state.selectedUser.username == 'Anon' && state.selectedDrink != null) || (state.selectedUser != null && state.selectedDrink != null && state.getDrink().discountprice <= state.selectedUser.ledger))" variant="success" v-on:click="buy()"><span class="fas p-3 fa-2x fa-check"></span></b-button>
                     </b-button-group>
                     
                 </b-collapse>
