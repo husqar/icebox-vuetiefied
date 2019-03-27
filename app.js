@@ -155,6 +155,8 @@ const Revert_order = {
     data: () => ({
         dismissSecs: 10,
         dismissCountDown: 0,
+        dismissSecsCharge: 10,
+        dismissCountDownCharge: 0,
         selectedUser: state.selectedUser,
         selectDrink: state.selectedDrink
     }),
@@ -185,12 +187,18 @@ const Revert_order = {
         },
         countDownChanged (dismissCountDown) {
             this.dismissCountDown = dismissCountDown;
-          },
+        },
+        countDownChangedCharge (dismissCountDownCharge) {
+            this.dismissCountDownCharge = dismissCountDownCharge;
+        },
         hideAlert(){
             this.dismissCountDown = 0;
         },
         showAlert () {
             this.dismissCountDown= this.dismissSecs;
+        },
+        showChargeAlert(){
+            this.dismissCountDownCharge = this.dismissSecsCharge; 
         },
         unbuy(){
             console.log(this.state.undoParameters);
@@ -241,6 +249,8 @@ const Revert_order = {
             console.log(baseUrl+'consumers/'+this.state.selectedUser.username+'/deposit');
             axios.post(baseUrl+'consumers/'+this.state.selectedUser.username+'/deposit', postData ).then(response => {
                 this.eventHub.$emit('charged');
+                this.showChargeAlert();
+       
                 
                 console.log(response);
             }).catch(error => {

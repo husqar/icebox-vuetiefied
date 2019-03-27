@@ -126,6 +126,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                 @dismiss-count-down="countDownChanged">
                     Gekauft! Du kannst noch {{dismissCountDown}} Sekunden <b-button v-on:click="unbuy" variant="danger"> Undo</b-button> machen!
                 </b-alert>
+                <b-alert class="mr-auto mb-2 mt-2" :show="dismissCountDownCharge"
+                dismissible
+                fade
+                variant="secondary"
+                @dismissed="dismissCountDownCharge=0"
+                @dismiss-count-down="countDownChangedCharge">
+                    Erfolgreich aufgeladen! Geld eingeworfen?
+                </b-alert>
             </b-container>
         </template>
 
