@@ -36,8 +36,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <style type="text/css">
             ::-webkit-scrollbar {
                 display: none;
-            
-
             }
             *{
                 cursor: none;
@@ -46,18 +44,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
         <div id="app">
                 <b-modal id="error" title="Ooops">
-                        <p class="my-4">Irgend etwas ist schief gelaufen, eventuell hast du kein Guthaben.</p>
+                        <p class="my-4">Irgend etwas ist schief gelaufen.</p>
                 </b-modal>
             <b-navbar style=" height:90px;" sticky toggleable="sm" type="light" variant="light">
-     
+                    
                     <b-navbar-brand href="#"><b-img src="img/icebox-logo-klein.png"></b-img></b-navbar-brand>
- 
-                <router-view name="navbar">
+                    
+                <router-view name="navbar"></router-view>
+                <b-button v-show="state.selectedUser != null && state.selectedUser.username !='Anon' && state.selectedDrink == null && 
+                $route.name != 'charge'" v-on:click="$router.push('charge')" style="margin-right: 5%;" class="p-4">Aufladen</b-button>
+                <b-button v-show="$route.name == 'charge'" v-on:click="$router.push('/')" style="margin-right: 5%;" class="p-4">Kaufen</b-button>
             </b-navbar>
-            <router-view name="main">
+            <router-view name="main"/>
         </div>
-        <div>
-
 
         <template id="inventur-template">
             <b-container fluid>
@@ -65,17 +64,58 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             </container>
         </template>
 
+
+        <template id="charge-template">
+            <div>
+                <b-container fluid>
+                        
+                    <b-collapse v-model="state.showConsumers" id="consumer-collapse">                    
+                        <consumers></consumers>
+                    </b-collapse>
+                </container>
+                
+                    <b-container fluid>
+                        <b-row style="padding-top: 1em">
+                            <b-col cols="12"><h3 style="margin:auto">Wie viel darf es denn sein?</h3></b-col>
+                        </b-row>
+                        <b-row>
+
+                            <b-col cols="12">
+                                    <b-button v-on:click="selectAmount(500)" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">5 Euro</span></b-button>
+                            </b-col>
+                            </b-row>
+                            <b-row>
+                            <b-col>
+                                    <b-button  v-on:click="selectAmount(1000)" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">10 Euro</span></b-button>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                    <b-button  v-on:click="selectAmount(2000)" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">20 Euro</span></b-button>
+                            </b-col>
+                        </b-row>
+                        <b-row>
+                            <b-col>
+                                    <b-button  v-on:click="selectAmount(5000)" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">50 Euro</span></b-button>
+                            </b-col>
+
+                        </b-row>    
+                    </b-container>
+                </div>
+            </template>
+
         <template id="revert-order-template">
             <b-container fluid>
             <b-collapse v-model="collapsed" invisible id="revert-order-collapse">
                   <b-button-group class="lg">
-                        <b-button variant="danger" v-on:click="deselectUser(); deselectDrink()"><span class="fas p-3 fa-2x fa-times"></span></b-button>
-                        <b-button class="p-4" v-on:click="deselectUser()">{{ selectedUserName }} <b-badge variant="info" v-if="state.selectedUser != null && state.selectedUser.username != 'Anon' ">{{ state.selectedUser.ledger/100 }}€</b-badge></b-button>
-                        <b-button class="p-4" disabled>kauft</b-button>
-                        <b-button class="p-4" v-on:click="deselectDrink()">{{ selectedDrinkName }} <b-badge variant="info" v-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username != 'Anon'">{{state.getDrink().discountprice/100}}€</b-badge><b-badge variant="info" v-else-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username == 'Anon'">{{state.getDrink().fullprice/100}}€</b-badge></b-button>
-                        <b-button class="" v-if="((state.selectedUser != null && state.selectedUser.username == 'Anon' && state.selectedDrink != null) || (state.selectedUser != null && state.selectedDrink != null && state.getDrink().discountprice <= state.selectedUser.ledger))" variant="success" v-on:click="buy()"><span class="fas p-3 fa-2x fa-check"></span></b-button>
+                        <b-button class="p-4" variant="danger" v-on:click="deselectUser(); deselectDrink(); deselectCharge()"><span class="fas fa-2x fa-times"></span></b-button>
+                        <b-button v-show="state.selectedUser" class="p-4" v-on:click="deselectUser()">{{ selectedUserName }} <b-badge variant="info" v-if="state.selectedUser != null && state.selectedUser.username != 'Anon' ">{{ state.selectedUser.ledger/100 }}€</b-badge></b-button>
+                        <b-button v-show="state.selectedUser && (state.selectedDrink || state.chargeAmount)" class="p-4" disabled><span v-if="$route.name='charge'">laedt</span><span v-else>kauft</span></b-button>
+                        <b-button v-show="state.selectedDrink && $route.name != 'charge'" class="p-4" v-on:click="deselectDrink()">{{ selectedDrinkName }} <b-badge variant="info" v-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username != 'Anon'">{{state.getDrink().discountprice/100}}€</b-badge><b-badge variant="info" v-else-if="state.selectedDrink != null && state.selectedUser != null && state.selectedUser.username == 'Anon'">{{state.getDrink().fullprice/100}}€</b-badge></b-button>
+                        <b-button v-show="$route.name='charge' && state.chargeAmount">{{this.state.chargeAmount / 100}}€ </b-button>
+                        <b-button class="" v-if="$route.name !='charge' && ((state.selectedUser != null && state.selectedUser.username == 'Anon' && state.selectedDrink != null) || (state.selectedUser != null && state.selectedDrink != null && state.getDrink().discountprice <= state.selectedUser.ledger))" variant="success" v-on:click="buy()"><span class="fas p-3 fa-2x fa-check"></span></b-button>
+                        <b-button class="" v-if="$route.name =='charge' && state.selectedUser != null && state.chargeAmount > 0" variant="success" v-on:click="charge()"><span class="fas p-3 fa-2x fa-check"></span></b-button>
                     </b-button-group>
-                    
                 </b-collapse>
 
                 <b-alert class="mr-auto mb-2 mt-2" :show="dismissCountDown"
@@ -92,8 +132,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
         <template id="overview-template">
               <!-- Modal Component -->
             <b-container fluid >
-                <b-collapse v-model="showConsumers" id="consumer-collapse">
-                    <keyboard></keyboard>
+                <b-collapse v-model="state.showConsumers" id="consumer-collapse">                    
                     <consumers></consumers>
                 </b-collapse>
                 <drinks></drinks>
@@ -112,6 +151,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
             </b-container>
         </template>
 
+    
         <template id="drinks-template">
             <b-container fluid>
                 <h3>Getränk wählen:</h3>
@@ -128,7 +168,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                                 <b-row>
                                     <b-col cols="4">
 
-
                                         <b-img
                                         center 
                                         height="90em" block
@@ -143,8 +182,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
                                         <div>
                                             {{drink.name}}<br/>
                                             Anzahl: {{drink.quantity}}<br/>
-                                            Preis: <template v-if="state.selectedUser === 'Anon'">{{drink.fullprice}}</template>
-                                                   <template v-else>{{drink.discountprice}}</template>
+                                            Preis: <template v-if="state.selectedUser != null && state.selectedUser.username != 'Anon'">{{drink.discountprice}}</template>
+                                                   <template v-else>{{drink.fullprice}}</template>
                                         </div>
                                     </b-col>
                                 </b-row>
@@ -157,10 +196,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
         <template id="consumers-template">
                 <div class="mb-3">
+                    <keyboard></keyboard>
                     <b-container fluid>
                         <h3>Wähle deinen Nutzernamen:</h3>
-                        <b-row>
-                          <b-col cols="12"><b-button block variant="success" v-on:click="selectConsumer({username: 'Anon'})" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">Bar</span></b-button></b-col>
+                        <b-row v-show="$route.name!='charge'">
+                          <b-col cols="12"><b-button variant="success" v-on:click="selectConsumer({username: 'Anon'})" class="m-1" block><span class="font-weight-bold" style="font-size:4em;">Bar</span></b-button></b-col>
                         </b-row>
                         <b-row>
                             <b-col sm="6" lg="3" md="4" xl="2" v-for="consumer in filteredConsumers" :key="consumer.username">

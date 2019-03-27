@@ -29,6 +29,8 @@ const state = {
     selectedDrink: null,
     drinkCursor: {},
     undoParameters: {},
+    showConsumers: true,
+    chargeAmount: 0,
 
     findDrinkByBarcode (barcode){
         return this.drinks.find(drink => drink.barcode === barcode);
@@ -46,63 +48,18 @@ const state = {
 Vue.config.debug = false;
 Vue.config.devtools = false;
 
-//Eventually you want to use VueX instead of a global eventHub...
-Vue.mixin({
-    data: function () {
-        return {
-            state:state,
-            eventHub: eventHub,
-        };
-    },
-    methods:{
-        getDrinks() {
-            axios.get(baseUrl + `drinks`).then(response => {
-                response.data.map(drink => drink.image = 'img/'+drink.barcode+'.png');
-                response.data = response.data.filter(function(drink){
-                    if(drink.quantity > 0){
-                        return drink; 
-                    }
-                });
-                this.state.drinks = response.data;
 
-                console.log(response.data);
-            }).catch(error => {
-                console.log(error);
-            });
-            
-        },
-        getConsumers(){
-            axios.get(baseUrl + `consumers`).then(response => {
-                console.log(response.data);
-                this.state.consumers = response.data;
-            }).catch(error => {
-                console.log(error);
-            });
-        },
-        getConsumer(id){
-            axios.get(baseUrl + `consumers/`+id).then(response => {
-                console.log(response.data);
-                this.state.selectedUser = response.data;
-            }).catch(error => {
-                console.log(error);
-            });
-        }
-    },
-});
 
 const Overview = {
     template: '#overview-template',
-    data:()=>({
-        showConsumers: true
-    }),
     inherit: true,
     mounted(){
         this.eventHub.$on('user-selected',data => {
-            this.showConsumers = false;
+            state.showConsumers = false;
         });
 
         this.eventHub.$on('user-deselected',data => {
-            this.showConsumers = true;
+            state.showConsumers = true;
         });
         this.eventHub.$on('bought',data =>{
             this.getDrinks();
@@ -112,6 +69,31 @@ const Overview = {
     },
 };
 Vue.component('overview', Overview);
+
+const Charge = {
+    template: '#charge-template',
+    inherit: true,
+    mounted(){
+        this.eventHub.$on('user-selected',data => {
+            state.showConsumers = false;
+        });
+
+        this.eventHub.$on('user-deselected',data => {
+            state.showConsumers = true;
+        });
+        this.eventHub.$on('bought',data =>{
+            this.getDrinks();
+        });
+
+    
+    },
+    methods:{
+        selectAmount(chargeAmount){
+            this.state.chargeAmount = chargeAmount;
+        }
+    }
+};
+Vue.component('charge', Charge);
 
 const Keyboard = {
     template: '#keyboard-template',
@@ -186,6 +168,11 @@ const Revert_order = {
         });          
     },
     methods:{
+        deselectCharge(){
+            this.state.chargeAmount=0;
+            this.eventHub.$emit('charge-deselected');
+
+        },
         deselectUser(){
             this.state.selectedUser=null;
             console.log('user deselected');
@@ -232,18 +219,41 @@ const Revert_order = {
             this.state.undoParameters = response.data.undoparameters;
             console.log(response);
             this.showAlert();
+            this.eventHub.$emit('bought');
 
         }).catch(error => {
   
             this.$root.$emit('bv::show::modal','error');
             this.eventHub.$emit('notbought');
+        
 
         });
-            this.eventHub.$emit('bought');
+            
             this.getConsumers();
             this.getDrinks();
             this.deselectDrink();
             this.deselectUser();
+        },
+        charge(){
+            postData = {
+                "amount": this.state.chargeAmount,
+            };
+            console.log(baseUrl+'consumers/'+this.state.selectedUser.username+'/deposit');
+            axios.post(baseUrl+'consumers/'+this.state.selectedUser.username+'/deposit', postData ).then(response => {
+                this.eventHub.$emit('charged');
+                
+                console.log(response);
+            }).catch(error => {
+  
+                this.$root.$emit('bv::show::modal','error');
+                this.eventHub.$emit('notbought');
+            
+    
+            });
+
+                this.getConsumers();
+                this.deselectCharge();
+                this.deselectUser();
         }
     },
     watch:{
@@ -276,6 +286,9 @@ const Revert_order = {
     }
 };
 Vue.component('revert-order', Revert_order); 
+
+
+
 
 const Consumers = {
     template: '#consumers-template',
@@ -337,14 +350,66 @@ const router = new VueRouter({
         {
             path: '/inventur',
             name: 'inventur',
-                components:{
+            components:{
                     main: Inventur
                 }
-        }
+        },
+        {
+            path: '/charge',
+            name: 'charge',
+            components:{
+                    main: Charge,
+                    navbar: Revert_order
+                }
+        },
+        
     ]
   });
   
+//Eventually you want to use VueX instead of a global eventHub...
+Vue.mixin({
+    data: function () {
+        return {
+            state:state,
+            eventHub: eventHub,
+        };
+    
+    },
+    methods:{
+        getDrinks() {
+            axios.get(baseUrl + `drinks`).then(response => {
+                response.data.map(drink => drink.image = 'img/'+drink.barcode+'.png');
+                response.data = response.data.filter(function(drink){
+                    if(drink.quantity > 0){
+                        return drink; 
+                    }
+                });
+                this.state.drinks = response.data;
 
+                console.log(response.data);
+            }).catch(error => {
+                console.log(error);
+            });
+            
+        },
+        getConsumers(){
+            axios.get(baseUrl + `consumers`).then(response => {
+                console.log(response.data);
+                this.state.consumers = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
+        },
+        getConsumer(id){
+            axios.get(baseUrl + `consumers/`+id).then(response => {
+                console.log(response.data);
+                this.state.selectedUser = response.data;
+            }).catch(error => {
+                console.log(error);
+            });
+        }
+    },
+});
 const vue = new Vue({
     router
 });
